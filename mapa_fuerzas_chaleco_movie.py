@@ -1,14 +1,16 @@
 '''
-This script produces an animation of the temporal evolution of the density.
-The input file is the configuration file (positions for every timestep). 
-
+Este programa produce una animacion que representa la evolucion 
+temporal del mapa de fuerzas. 
 '''
+
+################### LIBRARIES & PLOT SETTINGS ###################
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import matplotlib.patches as patches
 import pylab
 import math
+import pandas as pd
 
 golden_mean = (math.sqrt(5)-1.0)/2.0        # Aesthetic ratio
 fig_width = 3+3/8 			    			# width  in inches
@@ -37,27 +39,28 @@ params = {'backend': 'ps',
 pylab.rcParams.update(params)
 
 ################### PARAMETERS ###################
+input_filename = 'datos_subteB_16-9.txt'
+output_filename = 'chaleco1'
+timestep_min = 5040
+timestep_max = 5090
 xi = 0.0
 xf = 1.0
 rows = 3
 yi = 0.0
 yf = 1.0
 cols = 4
-output_filename = 'chaleco1'
-##################################################
 
-
-
+################ FUNCTIONS ######################
 def animate(i):
 	'''
 	Animation function
 	'''
+
 	global cont
 	z = lista_grilla_fuerzas[i]
 	cont = plt.contourf(grid_x, grid_y, z, levels, cmap=plt.cm.jet,zorder=1)
-	plt.title('Force map in the back ',fontsize=10)
+	plt.title("Force map in the back \t\t-\t\t timestep = %i" %i,fontsize=10)
 	return cont
-
 
 def grafica_bordes_chaleco():
   '''
@@ -79,71 +82,84 @@ def grafica_bordes_chaleco():
 
 
 
-def asigna_fuerzas(s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12):
+def asigna_fuerzas(s0,s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11):
   '''
   Actualiza la grilla de fuerzas con los valores de las fuerzas
   reportados por cada sensor
   '''
   
-  grilla_fuerzas= np.zeros((rows,cols)) # Inicializa con ceros 
-  grilla_fuerzas[2,0]=s1
-  grilla_fuerzas[2,1]=s2
-  grilla_fuerzas[2,2]=s3
-  grilla_fuerzas[2,3]=s4
-  grilla_fuerzas[1,0]=s5
-  grilla_fuerzas[1,1]=s6
-  grilla_fuerzas[1,2]=s7
-  grilla_fuerzas[1,3]=s8
-  grilla_fuerzas[0,0]=s9
-  grilla_fuerzas[0,1]=s10
-  grilla_fuerzas[0,2]=s11
-  grilla_fuerzas[0,3]=s12
+  grilla_fuerzas = np.zeros((rows,cols)) # Inicializa con ceros 
+  grilla_fuerzas[2,0] = s0
+  grilla_fuerzas[2,1] = s1
+  grilla_fuerzas[2,2] = s6
+  grilla_fuerzas[2,3] = s7
+  grilla_fuerzas[1,0] = s2
+  grilla_fuerzas[1,1] = s3
+  grilla_fuerzas[1,2] = s8
+  grilla_fuerzas[1,3] = s9
+  grilla_fuerzas[0,0] = s4
+  grilla_fuerzas[0,1] = s5
+  grilla_fuerzas[0,2] = s10
+  grilla_fuerzas[0,3] = s11
 
-  # Faltan los sensores de los hombros.
+  # To do:Faltan los sensores de los hombros.
 
   return grilla_fuerzas
 
+def importa_dataset(input_filename):
+	df = pd.read_csv("{}".format(input_filename),delimiter=' ',engine="python") 
+	return df
 
-################ MAIN ######################3
+def crea_lista_grilla_fuerzas(timestep_min,timestep_max):
+	'''
+	Crea una lista de grillas, cada elemento de la lista corresponde
+	a una grilla de fuerzas en un determinado timestep. 
+	'''
+
+	lista_grilla_fuerzas = []
+	for time in range(timestep_min,timestep_max+1):
+	  
+	  grilla_fuerzas = asigna_fuerzas(serie_s0[time],serie_s1[time],serie_s2[time],serie_s3[time],
+	  serie_s4[time],serie_s5[time],serie_s6[time],serie_s7[time],
+	  serie_s8[time],serie_s9[time],serie_s10[time],serie_s11[time])
+
+	  lista_grilla_fuerzas += [grilla_fuerzas]
+	return lista_grilla_fuerzas
+
+################ MAIN ######################
 
 
-sensor1=[100,120,130]
-sensor2=[110,130,110]
-sensor3=[170,140,130]
-sensor4=[180,110,150]
-sensor5=[140,120,150]
-sensor6=[120,130,190]
-sensor7=[110,180,160]
-sensor8=[130,150,130]
-sensor9=[150,120,103]
-sensor10=[107,103,120]
-sensor11=[150,180,130]
-sensor12=[130,160,150]
-sensor13=[100,140,190]
-sensor14=[190,170,110]
+##### LOAD DATA #####
+df = importa_dataset(input_filename)
+serie_s0 = df.iloc[:,1].tolist()
+serie_s1 = df.iloc[:,2].tolist()
+serie_s2 = df.iloc[:,3].tolist()
+serie_s3 = df.iloc[:,4].tolist()
+serie_s4 = df.iloc[:,5].tolist()
+serie_s5 = df.iloc[:,6].tolist()
+serie_s6 = df.iloc[:,7].tolist()
+serie_s7 = df.iloc[:,8].tolist()
+serie_s8 = df.iloc[:,9].tolist()
+serie_s9 = df.iloc[:,10].tolist()
+serie_s10 = df.iloc[:,11].tolist()
+serie_s11 = df.iloc[:,12].tolist()
 
+##### SETTINGS #####
+lista_grilla_fuerzas = crea_lista_grilla_fuerzas(timestep_min,timestep_max)
 
-lista_grilla_fuerzas = []
-for time in range(0,len(sensor1)):
-  
-  grilla_fuerzas = asigna_fuerzas(sensor1[time],sensor2[time],sensor3[time],sensor4[time],
-  sensor5[time],sensor6[time],sensor7[time],sensor8[time],
-  sensor9[time],sensor10[time],sensor11[time],sensor12[time])
-
-  lista_grilla_fuerzas+=[grilla_fuerzas]
-
+##### SETTINGS #####
 total_frames = len(lista_grilla_fuerzas)
 grid_x = np.linspace(xi,xf,cols)
 grid_y = np.linspace(yi,yf,rows) 
-grid_density0=lista_grilla_fuerzas[0]
+grid_density0 = lista_grilla_fuerzas[0]
 
+##### PLOT #####
 fig = plt.figure()
 ax = plt.axes(xlim=(-1, 1), ylim=(0, 1.2))
 grafica_bordes_chaleco()
-
-levels=np.linspace(90,np.max(grilla_fuerzas),70,endpoint=True)
-levbar=np.linspace(20,np.max(grilla_fuerzas),12,endpoint=True)
-cont=plt.contourf(grid_x,grid_y,grid_density0, levels,cmap=plt.cm.jet)
+levels = np.linspace(10,np.max(lista_grilla_fuerzas),70,endpoint=True)
+levbar = np.linspace(10,np.max(lista_grilla_fuerzas),8,endpoint=True)
+cont = plt.contourf(grid_x,grid_y,grid_density0, levels,cmap=plt.cm.jet)
 plt.colorbar(ticks=levbar)
 plt.grid(False)
 plt.xlabel('$x$-location~(m)',fontsize=10)
@@ -152,5 +168,6 @@ plt.xlim(-0.5,1.5)
 plt.ylim(0,1.2)
 plt.subplots_adjust(bottom=0.29,right=0.98,left=0.15)
 
+##### ANIMATION #####
 anim = animation.FuncAnimation(fig, animate, frames=total_frames, repeat=False)
 anim.save('{}.mp4'.format(output_filename), writer=animation.FFMpegWriter())
