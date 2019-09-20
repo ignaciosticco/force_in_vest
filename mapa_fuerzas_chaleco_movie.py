@@ -97,16 +97,16 @@ def asigna_fuerzas(s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12):
 
 sensor1=[100,200,300]
 sensor2=[90,80,100]
-sensor3=[120,330,70]
-sensor4=[89,90,77]
-sensor5=[112,200,300]
-sensor6=[90,80,100]
-sensor7=[50,330,70]
-sensor8=[87,90,77]
-sensor9=[4,200,300]
-sensor10=[0,80,100]
-sensor11=[0,330,70]
-sensor12=[12,90,77]
+sensor3=[120,350,30]
+sensor4=[89,90,73]
+sensor5=[112,234,130]
+sensor6=[90,84,50]
+sensor7=[50,120,73]
+sensor8=[87,230,37]
+sensor9=[4,200,20]
+sensor10=[0,80,134]
+sensor11=[2,330,73]
+sensor12=[12,90,74]
 
 
 time = 0 
@@ -117,7 +117,7 @@ grid_y = np.linspace(0,1,3)
 
 
 lista_grilla_fuerzas = []
-for i in range(0,len(sensor1)):
+for time in range(0,len(sensor1)):
   
   grilla_fuerzas = asigna_fuerzas(sensor1[time],sensor2[time],sensor3[time],sensor4[time],
   sensor5[time],sensor6[time],sensor7[time],sensor8[time],
@@ -125,11 +125,7 @@ for i in range(0,len(sensor1)):
 
   lista_grilla_fuerzas+=[grilla_fuerzas]
 
-print(lista_grilla_fuerzas)
 total_frames = len(lista_grilla_fuerzas)
-
-#data_config = input("Enter configurations file name:\n")
-#lista_grid_density,lista_number_pedestrians = main_loop(data_config)
 
 grid_x = np.linspace(0,1,4)
 grid_y = np.linspace(0,1,3) 
@@ -138,10 +134,6 @@ grid_density0=lista_grilla_fuerzas[0]
 fig = plt.figure()
 ax = plt.axes(xlim=(-1, 1), ylim=(0, 1.2))
 grafica_bordes_chaleco()
-
-rect = patches.Rectangle((27,10.5),1,3,linewidth=1,edgecolor='g',facecolor='g')
-ax.add_patch(rect)
-
 
 levels=np.linspace(10,np.max(grilla_fuerzas),70,endpoint=True)
 levbar=np.linspace(10,np.max(grilla_fuerzas),12,endpoint=True)
@@ -153,7 +145,7 @@ plt.ylabel('$y$-location~(m)',fontsize=10)
 plt.title('Force map in the back ',fontsize=10)
 plt.xlim(-0.5,1.5)
 plt.ylim(0,1.2)
-plt.subplots_adjust(bottom=0.19,right=1.02,left=0.15)
+plt.subplots_adjust(bottom=0.29,right=0.98,left=0.15)
 
 anim = animation.FuncAnimation(fig, animate, frames=total_frames, repeat=False)
 anim.save('animation_chaleco.mp4', writer=animation.FFMpegWriter())
