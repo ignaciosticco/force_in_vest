@@ -3,7 +3,7 @@ This script produces an animation of the temporal evolution of the density.
 The input file is the configuration file (positions for every timestep). 
 
 '''
-
+ 
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
